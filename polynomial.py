@@ -6,6 +6,9 @@ class Polynomial:
 		self.coef = [x % modulo for x in coef]
 		self.truncate()
 
+	def copy(self):
+		return Polynomial(self.modulo, self.coef)
+
 	def truncate(self):
 		while len(self.coef)>1 and self.coef[-1] == 0:
 			del self.coef[-1]
@@ -16,8 +19,9 @@ class Polynomial:
 		del self.coef[-1]
 
 	def shift(self):
-		self.degree += 1
-		self.coef.insert(0, 0)
+		if self.coef[-1] > 0:
+			self.degree += 1
+			self.coef.insert(0, 0)
 
 	def add(self, pol):
 		degree = max(self.degree, pol.degree)
@@ -26,20 +30,19 @@ class Polynomial:
 		self.coef = [(self.coef[i] + pol.coef[i]) % self.modulo for i in range(degree + 1)]
 		self.degree = degree
 		self.truncate()
+		pol.truncate()
 
 	def power(self, k):
-		if k == 0:
-			self.coef = [0]
-			self.degree = 0
-		elif k>1:
-			tmp = Polynomial(self.modulo, self.coef)
-			self.coef = [0]
-			self.degree = 0
-			while k>0:
-				if (k&1) == 1:
-					self.add(tmp)
-				tmp.add(tmp)
-				k >>= 1
+		if k == 1:
+			return
+		tmp = self.copy()
+		self.coef = [0]
+		self.degree = 0
+		while k > 0:
+			if (k&1) == 1:
+				self.add(tmp)
+			tmp.add(tmp)
+			k >>= 1
 
 	def subtract(self, pol):
 		degree = max(self.degree, pol.degree)
@@ -48,6 +51,7 @@ class Polynomial:
 		self.coef = [(self.coef[i] - pol.coef[i] + self.modulo) % self.modulo for i in range(degree + 1)]
 		self.degree = degree
 		self.truncate()
+		pol.truncate()
 
 	def multiply(self, pol):
 		degree = self.degree + pol.degree
@@ -64,7 +68,7 @@ class Polynomial:
 			return
 		res = Polynomial(self.modulo, [self.coef[i] for i in range(pol.degree)])
 		base = Polynomial(self.modulo)
-		cpol = Polynomial(self.modulo, pol.coef)
+		cpol = pol.copy()
 		cpol.power(invmod(cpol.coef[-1], self.modulo))
 		cpol.decrement_degree()
 		base.subtract(cpol)
