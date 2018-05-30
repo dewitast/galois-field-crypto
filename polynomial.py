@@ -1,3 +1,5 @@
+from random import randint
+
 from .utils import invmod
 
 class Polynomial:
@@ -8,6 +10,10 @@ class Polynomial:
 
 	def copy(self):
 		return Polynomial(self.modulo, self.coef)
+
+	def generate(self, deg):
+		self.coef = [randint(0, self.modulo - 1) for _ in range(deg)]
+		self.truncate()
 
 	def truncate(self):
 		while len(self.coef)>1 and self.coef[-1] == 0:

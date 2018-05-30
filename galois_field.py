@@ -1,4 +1,4 @@
-from polynomial import Polynomial
+from .polynomial import Polynomial
 
 class GaloisField:
 	def __init__(self, prime, power, coef, modcoef):
@@ -14,6 +14,9 @@ class GaloisField:
 	def copy(self):
 		return GaloisField(self.prime, self.power, self.poly.coef, self.modulo.coef)
 
+	def generate(self):
+		self.poly.generate(self.power)
+
 	def add(self, other):
 		self.poly.add(other.poly)
 
@@ -22,7 +25,7 @@ class GaloisField:
 		self.poly.mod(self.modulo)
 
 	def powerr(self, k):
-		# k %= self.order
+		k %= self.order
 		if k == 1:
 			return
 		tmp = self.copy()
